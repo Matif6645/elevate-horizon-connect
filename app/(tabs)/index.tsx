@@ -1,98 +1,175 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import React from "react";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 export default function HomeScreen() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+    <View style={styles.screen}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Elevate Horizon Connect</Text>
+        <Pressable style={styles.settingsButton}>
+          <Text style={styles.settingsIcon}>⚙️</Text>
+        </Pressable>
+      </View>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      {/* Welcome card */}
+      <View style={styles.card}>
+        <Text style={styles.welcomeTitle}>Welcome</Text>
+        <Text style={styles.welcomeText}>
+          Find and register for community events.
+        </Text>
+
+        <Pressable style={styles.primaryButton}>
+          <Text style={styles.primaryButtonText}>View Today’s Events</Text>
+        </Pressable>
+      </View>
+
+      {/* Search bar */}
+      <TextInput
+        placeholder="Search Events..."
+        placeholderTextColor="#6b7280"
+        style={styles.search}
+      />
+
+      {/* Category chips */}
+      <View style={styles.chipsRow}>
+        {[
+          "Athletics",
+          "Today",
+          "Fitness",
+          "Music",
+          "Social",
+          "Outdoors",
+          "Family",
+        ].map((item) => (
+          <View key={item} style={styles.chip}>
+            <Text style={styles.chipText}>{item}</Text>
+          </View>
+        ))}
+      </View>
+
+      {/* Events */}
+      <Text style={styles.sectionTitle}>Showing: Today – 2 results</Text>
+
+      <View style={styles.eventCard}>
+        <Text style={styles.eventTitle}>Morning Yoga</Text>
+        <Text style={styles.eventMeta}>08:30–09:15 • Community Hall</Text>
+        <Text style={styles.eventMeta}>Spots remaining: 5</Text>
+      </View>
+
+      <View style={styles.eventCard}>
+        <Text style={styles.eventTitle}>Trail Walk</Text>
+        <Text style={styles.eventMeta}>11:30–14:30 • Forest Trails</Text>
+        <Text style={styles.eventMeta}>Spots remaining: 15</Text>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  screen: {
+    flex: 1,
+    backgroundColor: "#2E7AA1",
+    padding: 16,
+    gap: 12,
+  },
+
+  header: {
+    height: 56,
+    backgroundColor: "#5FA8D3",
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  headerTitle: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "700",
+  },
+  settingsButton: {
+    padding: 6,
+  },
+  settingsIcon: {
+    color: "#FFFFFF",
+    fontSize: 18,
+  },
+
+  card: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 14,
+    padding: 14,
+    gap: 10,
+  },
+
+  welcomeTitle: {
+    fontSize: 22,
+    fontWeight: "800",
+    color: "#111827",
+  },
+  welcomeText: {
+    fontSize: 14,
+    color: "#374151",
+  },
+
+  primaryButton: {
+    borderWidth: 1,
+    borderColor: "#2E7AA1",
+    paddingVertical: 10,
+    alignItems: "center",
+    borderRadius: 8,
+  },
+  primaryButtonText: {
+    color: "#2E7AA1",
+    fontWeight: "700",
+  },
+
+  search: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    height: 44,
+    paddingHorizontal: 12,
+    fontSize: 14,
+  },
+
+  chipsRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  chip: {
+    backgroundColor: "#E6F2FA",
+    paddingHorizontal: 14,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: "center",
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  chipText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#1F3A5F",
+  },
+
+  sectionTitle: {
+    color: "#FFFFFF",
+    fontWeight: "700",
+    marginTop: 6,
+  },
+
+  eventCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 14,
+    padding: 14,
+    gap: 4,
+  },
+  eventTitle: {
+    fontSize: 16,
+    fontWeight: "800",
+    color: "#111827",
+  },
+  eventMeta: {
+    fontSize: 13,
+    color: "#374151",
   },
 });
