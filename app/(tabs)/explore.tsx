@@ -1,5 +1,7 @@
+import { router } from "expo-router";
 import React, { useMemo, useState } from "react";
 import {
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -7,17 +9,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-
-/* ---------- Event type ---------- */
-type EventItem = {
-  id: string;
-  title: string;
-  time: string;
-  location: string;
-  spots: number;
-  tags: string[];
-  dateLabel: string;
-};
+import { EVENTS } from "../../data/event";
 
 /* ---------- Tags ---------- */
 const ALL_TAGS = [
@@ -31,37 +23,6 @@ const ALL_TAGS = [
   "Popular",
   "Dance",
   "Indoors",
-];
-
-/* ---------- Dummy events ---------- */
-const EVENTS: EventItem[] = [
-  {
-    id: "1",
-    title: "Morning Yoga",
-    time: "08:30–09:15",
-    location: "Community Hall",
-    spots: 5,
-    tags: ["Fitness", "Today"],
-    dateLabel: "Today - Mon 24 Aug",
-  },
-  {
-    id: "2",
-    title: "Trail Walk",
-    time: "11:30–14:30",
-    location: "Forest Trails",
-    spots: 15,
-    tags: ["Fitness", "Today", "Outdoors"],
-    dateLabel: "Today - Mon 24 Aug",
-  },
-  {
-    id: "3",
-    title: "Beach Run",
-    time: "11:40–15:30",
-    location: "Sandy Beach",
-    spots: 3,
-    tags: ["Athletics", "Today", "Outdoors"],
-    dateLabel: "Today - Mon 24 Aug",
-  },
 ];
 
 /* ---------- Screen ---------- */
@@ -111,9 +72,7 @@ export default function EventsScreen() {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Events</Text>
-        <Pressable>
-          <Text style={styles.settingsIcon}>⚙️</Text>
-        </Pressable>
+        <Text style={styles.settingsIcon}>⚙️</Text>
       </View>
 
       {/* Filters */}
@@ -161,8 +120,7 @@ export default function EventsScreen() {
 
       {/* Results */}
       <Text style={styles.sectionTitle}>
-        Showing {filtered.length} result
-        {filtered.length === 1 ? "" : "s"}
+        Showing {filtered.length} result{filtered.length === 1 ? "" : "s"}
       </Text>
 
       <ScrollView>
@@ -170,13 +128,23 @@ export default function EventsScreen() {
           <Text style={styles.emptyText}>No events found</Text>
         ) : (
           filtered.map((e) => (
-            <View key={e.id} style={styles.eventCard}>
+            <Pressable
+              key={e.id}
+              style={({ pressed }) => [
+                styles.eventCard,
+                pressed && { opacity: 0.85 },
+                Platform.OS === "web" && { cursor: "pointer" as any },
+              ]}
+              onPress={() => {
+                (router as any).push(`/event/${e.id}`);
+              }}
+            >
               <Text style={styles.eventTitle}>{e.title}</Text>
               <Text style={styles.eventMeta}>
                 {e.time} • {e.location}
               </Text>
               <Text style={styles.eventMeta}>Spots remaining: {e.spots}</Text>
-            </View>
+            </Pressable>
           ))
         )}
       </ScrollView>
