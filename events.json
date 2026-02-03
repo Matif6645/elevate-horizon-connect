@@ -1,0 +1,29 @@
+[
+  {
+    "id": "1",
+    "title": "Morning Yoga in the Park",
+    "time": "7:00 AM – 8:00 AM",
+    "location": "Hyde Park, Sydney",
+    "spots": 10,
+    "tags": ["Today", "Fitness", "Outdoors"],
+    "dateLabel": "Today"
+  },
+  {
+    "id": "2",
+    "title": "Tech Networking Meetup",
+    "time": "6:30 PM – 8:30 PM",
+    "location": "Startup Hub, Sydney",
+    "spots": 25,
+    "tags": ["Social", "Popular"],
+    "dateLabel": "Today"
+  },
+  {
+    "id": "3",
+    "title": "Weekend Hiking Trip",
+    "time": "9:00 AM – 4:00 PM",
+    "location": "Blue Mountains",
+    "spots": 12,
+    "tags": ["Outdoors", "Family"],
+    "dateLabel": "This Weekend"
+  }
+]
