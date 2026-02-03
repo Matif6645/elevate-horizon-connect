@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import React from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
@@ -7,7 +8,9 @@ export default function HomeScreen() {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Elevate Horizon Connect</Text>
-        <Pressable style={styles.settingsButton}>
+
+        {/* Settings button */}
+        <Pressable onPress={() => router.push("/settings")}>
           <Text style={styles.settingsIcon}>⚙️</Text>
         </Pressable>
       </View>
@@ -19,19 +22,22 @@ export default function HomeScreen() {
           Find and register for community events.
         </Text>
 
-        <Pressable style={styles.primaryButton}>
+        <Pressable
+          style={styles.primaryButton}
+          onPress={() => router.push("/explore")}
+        >
           <Text style={styles.primaryButtonText}>View Today’s Events</Text>
         </Pressable>
       </View>
 
-      {/* Search bar */}
+      {/* Search */}
       <TextInput
         placeholder="Search Events..."
         placeholderTextColor="#6b7280"
         style={styles.search}
       />
 
-      {/* Category chips */}
+      {/* Category chips (demo only) */}
       <View style={styles.chipsRow}>
         {[
           "Athletics",
@@ -66,6 +72,7 @@ export default function HomeScreen() {
   );
 }
 
+/* ---------- Styles ---------- */
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
@@ -88,12 +95,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700",
   },
-  settingsButton: {
-    padding: 6,
-  },
   settingsIcon: {
-    color: "#FFFFFF",
     fontSize: 18,
+    color: "#FFFFFF",
   },
 
   card: {
