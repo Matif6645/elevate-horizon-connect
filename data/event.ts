@@ -6,6 +6,7 @@ export type EventItem = {
   spots: number;
   tags: string[];
   dateLabel: string;
+  description?: string; // ✅ FIX
 };
 
 export const EVENTS: EventItem[] = [
@@ -17,6 +18,7 @@ export const EVENTS: EventItem[] = [
     spots: 10,
     tags: ["Today", "Wellness", "Outdoor"],
     dateLabel: "Today",
+    description: "Start your day with relaxing yoga in nature.",
   },
   {
     id: "2",
@@ -26,6 +28,7 @@ export const EVENTS: EventItem[] = [
     spots: 25,
     tags: ["This Week", "Tech", "Networking"],
     dateLabel: "This Week",
+    description: "Meet professionals and expand your tech network.",
   },
   {
     id: "3",
@@ -35,5 +38,6 @@ export const EVENTS: EventItem[] = [
     spots: 15,
     tags: ["Weekend", "Adventure", "Outdoor"],
     dateLabel: "Weekend",
+    // description optional — OK to omit
   },
 ];

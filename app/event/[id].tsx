@@ -8,105 +8,80 @@ export default function EventDetailsScreen() {
 
   const event = useMemo(() => {
     const eventId = Array.isArray(id) ? id[0] : id;
-    return EVENTS.find((e) => e.id === eventId);
+
+    // ✅ IMPORTANT: compare as strings (handles number/string mismatch)
+    return EVENTS.find((e) => String(e.id) === String(eventId));
   }, [id]);
 
-  // ✅ guard: if event not found
+  // ✅ If event not found
   if (!event) {
     return (
       <View style={styles.screen}>
-        <View style={styles.header}>
-          <Pressable onPress={() => router.back()} style={styles.backBtn}>
-            <Text style={styles.backText}>← Back</Text>
-          </Pressable>
-          <Text style={styles.headerTitle}>Event Details</Text>
-          <View style={{ width: 60 }} />
-        </View>
+        <Text style={styles.title}>Event not found</Text>
 
-        <View style={styles.card}>
-          <Text style={styles.title}>Event not found</Text>
-          <Text style={styles.meta}>
-            The event ID is missing or doesn’t exist.
-          </Text>
-
-          <Pressable
-            style={styles.primaryButton}
-            onPress={() => router.push("/(tabs)/explore")}
-          >
-            <Text style={styles.primaryButtonText}>Go to Events</Text>
-          </Pressable>
-        </View>
+        <Pressable
+          style={styles.button}
+          onPress={() => router.push("/(tabs)/explore")}
+        >
+          <Text style={styles.buttonText}>Back to Events</Text>
+        </Pressable>
       </View>
     );
   }
-
-  // ✅ safe description: works even if your data doesn't have "description"
-  const description =
-    "description" in event && typeof (event as any).description === "string"
-      ? (event as any).description
-      : "No description available yet.";
 
   return (
     <View style={styles.screen}>
       {/* Header */}
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()} style={styles.backBtn}>
-          <Text style={styles.backText}>← Back</Text>
+        <Pressable onPress={() => router.back()}>
+          <Text style={styles.headerBtn}>← Back</Text>
         </Pressable>
 
         <Text style={styles.headerTitle}>Event Details</Text>
 
-        <Pressable
-          onPress={() => router.push("/(tabs)/explore")}
-          style={styles.rightBtn}
-        >
-          <Text style={styles.rightText}>Events</Text>
+        <Pressable onPress={() => router.push("/(tabs)/explore")}>
+          <Text style={styles.headerBtn}>Events</Text>
         </Pressable>
       </View>
 
-      <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
-        {/* Title card */}
+      <ScrollView>
+        {/* Event Info */}
         <View style={styles.card}>
           <Text style={styles.title}>{event.title}</Text>
-
-          <Text style={styles.meta}>⏱ {event.time}</Text>
-          <Text style={styles.meta}>📍 {event.location}</Text>
-          <Text style={styles.meta}>👥 Spots remaining: {event.spots}</Text>
+          <Text style={styles.text}>⏱ {event.time}</Text>
+          <Text style={styles.text}>📍 {event.location}</Text>
+          <Text style={styles.text}>👥 Spots remaining: {event.spots}</Text>
         </View>
 
-        {/* Tags */}
+        {/* Categories */}
         <View style={styles.card}>
-          <Text style={styles.sectionTitle}>Categories</Text>
+          <Text style={styles.subtitle}>Categories</Text>
+
           <View style={styles.tagsRow}>
-            {event.tags.map((t) => (
-              <View key={t} style={styles.tag}>
-                <Text style={styles.tagText}>{t}</Text>
+            {(event.tags ?? []).map((tag: string) => (
+              <View key={tag} style={styles.tag}>
+                <Text style={styles.tagText}>{tag}</Text>
               </View>
             ))}
           </View>
         </View>
 
-        {/* Description */}
+        {/* About */}
         <View style={styles.card}>
-          <Text style={styles.sectionTitle}>About this event</Text>
-          <Text style={styles.desc}>{description}</Text>
+          <Text style={styles.subtitle}>About</Text>
+          <Text style={styles.text}>
+            {event.description ?? "No description available."}
+          </Text>
         </View>
 
         {/* Register */}
         <View style={styles.card}>
-          <Text style={styles.sectionTitle}>Register</Text>
-          <Text style={styles.meta}>Tap below to register for this event.</Text>
-
           <Pressable
-            style={styles.primaryButton}
-            onPress={() => {
-              (router as any).push({
-                pathname: "/event/register",
-                params: { id: event.id },
-              });
-            }}
+            style={styles.button}
+            // ✅ IMPORTANT: matches your folder: app/event/register/[id].tsx
+            onPress={() => router.push(`/event/register/${String(event.id)}`)}
           >
-            <Text style={styles.primaryButtonText}>Register Now</Text>
+            <Text style={styles.buttonText}>Register Now</Text>
           </Pressable>
         </View>
       </ScrollView>
@@ -114,12 +89,12 @@ export default function EventDetailsScreen() {
   );
 }
 
+/* ---------- Styles ---------- */
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
     backgroundColor: "#2E7AA1",
     padding: 16,
-    gap: 12,
   },
 
   header: {
@@ -130,94 +105,68 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    marginBottom: 12,
   },
   headerTitle: {
-    color: "#FFFFFF",
+    color: "#fff",
     fontSize: 18,
-    fontWeight: "900",
-  },
-
-  backBtn: {
-    paddingVertical: 8,
-    paddingHorizontal: 10,
-    borderRadius: 10,
-    backgroundColor: "rgba(255,255,255,0.18)",
-  },
-  backText: {
-    color: "#FFFFFF",
     fontWeight: "800",
   },
-
-  rightBtn: {
-    paddingVertical: 8,
-    paddingHorizontal: 10,
-    borderRadius: 10,
-    backgroundColor: "rgba(255,255,255,0.18)",
-  },
-  rightText: {
-    color: "#FFFFFF",
-    fontWeight: "800",
+  headerBtn: {
+    color: "#fff",
+    fontWeight: "700",
   },
 
   card: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#fff",
     borderRadius: 14,
     padding: 14,
-    gap: 8,
-    marginTop: 10,
+    marginBottom: 12,
   },
 
   title: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "900",
-    color: "#111827",
+    marginBottom: 6,
   },
-  meta: {
+  subtitle: {
+    fontSize: 15,
+    fontWeight: "800",
+    marginBottom: 6,
+  },
+  text: {
     fontSize: 14,
     color: "#374151",
-    fontWeight: "600",
-  },
-
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: "900",
-    color: "#111827",
-  },
-  desc: {
-    fontSize: 14,
-    color: "#374151",
-    lineHeight: 20,
+    marginBottom: 4,
   },
 
   tagsRow: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 8,
-    marginTop: 6,
   },
   tag: {
     backgroundColor: "#E6F2FA",
     paddingHorizontal: 12,
-    height: 34,
-    borderRadius: 17,
+    height: 32,
+    borderRadius: 16,
     justifyContent: "center",
   },
   tagText: {
     fontSize: 12,
-    fontWeight: "900",
+    fontWeight: "700",
     color: "#1F3A5F",
   },
 
-  primaryButton: {
-    marginTop: 6,
+  button: {
     borderWidth: 1,
     borderColor: "#2E7AA1",
     paddingVertical: 12,
     alignItems: "center",
     borderRadius: 10,
   },
-  primaryButtonText: {
+  buttonText: {
     color: "#2E7AA1",
-    fontWeight: "900",
+    fontWeight: "800",
   },
 });
