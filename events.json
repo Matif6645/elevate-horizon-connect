@@ -14,7 +14,7 @@
     "time": "6:30 PM – 8:30 PM",
     "location": "Startup Hub, Sydney",
     "spots": 25,
-    "tags": ["Social", "Popular"],
+    "tags": ["Social", "Popular", "Indoors"],
     "dateLabel": "Today"
   },
   {
@@ -22,8 +22,35 @@
     "title": "Weekend Hiking Trip",
     "time": "9:00 AM – 4:00 PM",
     "location": "Blue Mountains",
-    "spots": 12,
+    "spots": 15,
     "tags": ["Outdoors", "Family"],
-    "dateLabel": "This Weekend"
+    "dateLabel": "Weekend"
+  },
+  {
+    "id": "4",
+    "title": "Community Music Night",
+    "time": "7:00 PM – 9:00 PM",
+    "location": "Community Hall, Sydney",
+    "spots": 30,
+    "tags": ["Music", "Social", "Popular"],
+    "dateLabel": "This Week"
+  },
+  {
+    "id": "5",
+    "title": "Beginner Dance Class",
+    "time": "5:30 PM – 6:30 PM",
+    "location": "Dance Studio, Sydney",
+    "spots": 18,
+    "tags": ["Dance", "Fitness", "Indoors"],
+    "dateLabel": "This Week"
+  },
+  {
+    "id": "6",
+    "title": "Local Athletics Meetup",
+    "time": "6:00 AM – 7:30 AM",
+    "location": "Olympic Park, Sydney",
+    "spots": 20,
+    "tags": ["Athletics", "Fitness", "Outdoors"],
+    "dateLabel": "This Week"
   }
 ]
