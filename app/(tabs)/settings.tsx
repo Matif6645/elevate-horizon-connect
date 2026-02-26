@@ -1,54 +1,33 @@
 import { useState } from "react";
-import { Alert, StyleSheet, Switch, Text, View } from "react-native";
+import { StyleSheet, Switch, Text, View } from "react-native";
 
 export default function SettingsScreen() {
-  const [darkMode, setDarkMode] = useState(false);
   const [largeText, setLargeText] = useState(false);
-  const [soundOn, setSoundOn] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+
+  const backgroundColor = darkMode ? "#111827" : "#2E7AA1";
 
   return (
-    <View style={styles.screen}>
+    <View style={[styles.screen, { backgroundColor }]}>
       <Text style={styles.title}>Settings</Text>
 
-      {/* Text Size */}
       <View style={styles.row}>
-        <Text style={styles.label}>Large Text</Text>
-        <Switch
-          value={largeText}
-          onValueChange={(v) => {
-            setLargeText(v);
-            Alert.alert("Demo", "Text size updated (demo)");
-          }}
-        />
+        <Text style={[styles.label, { fontSize: largeText ? 22 : 16 }]}>
+          Large Text
+        </Text>
+        <Switch value={largeText} onValueChange={setLargeText} />
       </View>
 
-      {/* Dark Mode */}
       <View style={styles.row}>
         <Text style={styles.label}>Dark Mode</Text>
-        <Switch
-          value={darkMode}
-          onValueChange={(v) => {
-            setDarkMode(v);
-            Alert.alert("Demo", "Theme updated (demo)");
-          }}
-        />
+        <Switch value={darkMode} onValueChange={setDarkMode} />
       </View>
 
-      {/* Sound */}
       <View style={styles.row}>
-        <Text style={styles.label}>Sound</Text>
-        <Switch
-          value={soundOn}
-          onValueChange={(v) => {
-            setSoundOn(v);
-            Alert.alert("Demo", "Sound setting updated (demo)");
-          }}
-        />
+        <Text style={styles.label}>Enable Sound</Text>
+        <Switch value={soundEnabled} onValueChange={setSoundEnabled} />
       </View>
-
-      <Text style={styles.note}>
-        Settings are for demonstration purposes only.
-      </Text>
     </View>
   );
 }
@@ -56,32 +35,24 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: "#2E7AA1",
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingTop: 70,
   },
   title: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: "800",
     color: "white",
-    marginBottom: 20,
+    marginBottom: 40,
   },
   row: {
-    backgroundColor: "white",
-    padding: 14,
-    borderRadius: 12,
-    marginBottom: 12,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: 30,
   },
   label: {
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  note: {
-    marginTop: 10,
     color: "white",
-    fontSize: 12,
-    opacity: 0.8,
+    fontWeight: "600",
+    fontSize: 16,
   },
 });
