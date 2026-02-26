@@ -1,50 +1,49 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
-import React from "react";
 
-import { HapticTab } from "@/components/haptic-tab";
-import { IconSymbol } from "@/components/ui/icon-symbol";
-import { Colors } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
+export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         headerShown: false,
-        tabBarButton: HapticTab,
+        tabBarShowLabel: true,
       }}
     >
+      {/* HOME */}
       <Tabs.Screen
         name="index"
         options={{
           title: "Home",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="house.fill" color={color} />
+          tabBarIcon: ({ size, color }) => (
+            <Ionicons name="home-outline" size={size} color={color} />
           ),
         }}
       />
 
+      {/* EVENTS */}
       <Tabs.Screen
         name="explore"
         options={{
-          title: "Explore",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="paperplane.fill" color={color} />
+          title: "Events",
+          tabBarIcon: ({ size, color }) => (
+            <Ionicons name="calendar-outline" size={size} color={color} />
           ),
         }}
       />
 
-      {/* ✅ SIMPLE SETTINGS TAB */}
+      {/* ✅ HIDE EVENT ROUTES FROM TAB BAR */}
+      <Tabs.Screen
+        name="event"
+        options={{
+          href: null,
+        }}
+      />
+
+      {/* SETTINGS (hidden from bottom tabs) */}
       <Tabs.Screen
         name="settings"
         options={{
-          title: "Settings",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="gearshape.fill" color={color} />
-          ),
+          href: null,
         }}
       />
     </Tabs>
