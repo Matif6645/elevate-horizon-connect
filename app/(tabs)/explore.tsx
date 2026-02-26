@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -9,210 +9,311 @@ import {
   TextInput,
   View,
 } from "react-native";
+import Constants from "expo-constants";
 
-/* ---------- Type ---------- */
+const API_BASE = "http://10.88.94.1:3001";
+const EVENTS_URL = `${API_BASE}/events`;
+
 type EventItem = {
-  id: string;
+  id: number;
   title: string;
   time: string;
   location: string;
   spots: number;
   tags: string[];
   dateLabel: string;
+  description?: string;
 };
 
-/* ---------- Tags ---------- */
-const ALL_TAGS = [
+const TAGS = [
+  "All",
   "Today",
+  "This Week",
+  "Weekend",
   "Fitness",
   "Social",
+  "Music",
   "Outdoors",
   "Family",
-  "Music",
   "Athletics",
   "Popular",
-  "Dance",
   "Indoors",
 ];
 
-export default function EventsScreen() {
+export default function ExploreScreen() {
   const [events, setEvents] = useState<EventItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const [query, setQuery] = useState("");
-  const [selectedTags, setSelectedTags] = useState<string[]>(["Today"]);
-  const [loading, setLoading] = useState(true); // 👈 loading flag
+  const [selected, setSelected] = useState<string>("All"); // ✅ FIXED
 
-  /* ---------- Fetch events (SIMPLE + FORCED LOADING) ---------- */
+  async function loadEvents() {
+    try {
+      setLoading(true);
+
+      const res = await fetch(EVENTS_URL);
+      const data = await res.json();
+
+      console.log("Explore fetched:", data);
+
+      setEvents(Array.isArray(data) ? data : []);
+    } catch (e) {
+      console.log("Explore fetch failed:", e);
+      setEvents([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   useEffect(() => {
-    setLoading(true);
-
-    setTimeout(() => {
-      fetch(
-        "https://raw.githubusercontent.com/Matif6645/elevate-horizon-connect/main/events.json",
-      )
-        .then((res) => res.json())
-        .then((data) => setEvents(data))
-        .finally(() => setLoading(false));
-    }, 800); // 👈 force loading to show
+    loadEvents();
   }, []);
 
-  /* ---------- Filter ---------- */
   const filtered = useMemo(() => {
-    const q = query.toLowerCase();
+    const q = query.trim().toLowerCase();
 
     return events.filter((e) => {
-      const matchText =
+      const matchesText =
+        q.length === 0 ||
         e.title.toLowerCase().includes(q) ||
-        e.location.toLowerCase().includes(q);
+        e.location.toLowerCase().includes(q) ||
+        (e.description ?? "").toLowerCase().includes(q) ||
+        (e.tags ?? []).join(" ").toLowerCase().includes(q);
 
-      const matchTags =
-        selectedTags.length === 0 ||
-        selectedTags.every((t) => e.tags.includes(t));
+      const matchesTag =
+        selected === "All"
+          ? true
+          : selected === "Today" ||
+              selected === "This Week" ||
+              selected === "Weekend"
+            ? (e.dateLabel ?? "").toLowerCase() === selected.toLowerCase() ||
+              (e.tags ?? []).includes(selected)
+            : (e.tags ?? []).includes(selected);
 
-      return matchText && matchTags;
+      return matchesText && matchesTag;
     });
-  }, [events, query, selectedTags]);
-
-  const toggleTag = (tag: string) => {
-    setSelectedTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag],
-    );
-  };
-
-  const clearFilters = () => {
-    setQuery("");
-    setSelectedTags([]);
-  };
-
-  /* ---------- LOADING SCREEN ---------- */
-  if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" />
-        <Text style={styles.centerText}>Loading events...</Text>
-      </View>
-    );
-  }
+  }, [events, query, selected]);
 
   return (
     <View style={styles.screen}>
-      <Text style={styles.header}>Events</Text>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Events</Text>
 
-      <TextInput
-        value={query}
-        onChangeText={setQuery}
-        placeholder="Search events"
-        style={styles.search}
-      />
-
-      <View style={styles.tags}>
-        {ALL_TAGS.map((tag) => (
-          <Pressable
-            key={tag}
-            onPress={() => toggleTag(tag)}
-            style={[styles.tag, selectedTags.includes(tag) && styles.tagActive]}
-          >
-            <Text>{tag}</Text>
-          </Pressable>
-        ))}
+        <Pressable
+          onPress={() => router.push("/(tabs)/settings")}
+          style={styles.settingsBtn}
+        >
+          <Text style={styles.settingsIcon}>⚙️</Text>
+        </Pressable>
       </View>
 
-      {/* ---------- EMPTY STATE ---------- */}
-      {filtered.length === 0 ? (
-        <View style={styles.center}>
-          <Text style={styles.centerText}>No events match these filters</Text>
-
-          <Pressable style={styles.clearBtn} onPress={clearFilters}>
-            <Text style={styles.clearBtnText}>Clear filters</Text>
-          </Pressable>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.searchWrap}>
+          <TextInput
+            value={query}
+            onChangeText={setQuery}
+            placeholder="Search Events..."
+            placeholderTextColor="#6b7280"
+            style={styles.search}
+          />
+          <Text style={styles.searchIcon}>🔍</Text>
         </View>
-      ) : (
-        <ScrollView>
-          {filtered.map((e) => (
-            <Pressable
-              key={e.id}
-              style={styles.card}
-              onPress={() => router.push(`/event/${e.id}`)}
-            >
-              <Text style={styles.title}>{e.title}</Text>
-              <Text>{e.time}</Text>
-              <Text>{e.location}</Text>
-              <Text>Spots: {e.spots}</Text>
+
+        <View style={styles.chipsRow}>
+          {TAGS.map((t) => {
+            const active = selected === t;
+            return (
+              <Pressable
+                key={t}
+                onPress={() => setSelected(t)}
+                style={[styles.chip, active && styles.chipActive]}
+              >
+                <Text style={[styles.chipText, active && styles.chipTextActive]}>
+                  {t}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+
+        <Text style={styles.resultsText}>
+          Showing: {selected} - {filtered.length} result
+          {filtered.length === 1 ? "" : "s"}:
+        </Text>
+
+        {loading ? (
+          <View style={styles.loadingBox}>
+            <ActivityIndicator size="large" color="white" />
+            <Text style={styles.loadingText}>Loading events…</Text>
+          </View>
+        ) : filtered.length === 0 ? (
+          <View style={styles.emptyBox}>
+            <Text style={styles.emptyTitle}>No events found</Text>
+            <Text style={styles.emptyText}>Try another tag or search term.</Text>
+
+            <Pressable style={styles.refreshBtn} onPress={loadEvents}>
+              <Text style={styles.refreshBtnText}>Refresh</Text>
             </Pressable>
-          ))}
-        </ScrollView>
-      )}
+          </View>
+        ) : (
+          filtered.map((event) => (
+            <Pressable
+              key={event.id}
+              style={styles.eventCard}
+              onPress={() => router.push(`/event/${event.id}`)}
+            >
+              <Text style={styles.eventTitle}>{event.title}</Text>
+
+              <View style={styles.metaRow}>
+                <Text style={styles.metaText}>🕒 {event.time}</Text>
+                <Text style={styles.metaText}>📍 {event.location}</Text>
+              </View>
+
+              <Text style={styles.spotsText}>
+                Spots remaining: {event.spots}
+              </Text>
+
+              <View style={styles.tagRow}>
+                {(event.tags ?? []).slice(0, 3).map((tag) => (
+                  <View key={tag} style={styles.tagPill}>
+                    <Text style={styles.tagPillText}>{tag}</Text>
+                  </View>
+                ))}
+              </View>
+            </Pressable>
+          ))
+        )}
+      </ScrollView>
     </View>
   );
 }
 
-/* ---------- Styles ---------- */
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: "#2E7AA1",
-  },
-  header: {
-    fontSize: 20,
-    fontWeight: "800",
-    color: "white",
-    marginBottom: 10,
-  },
-  search: {
-    backgroundColor: "white",
-    padding: 10,
-    borderRadius: 8,
-    marginBottom: 10,
-  },
-  tags: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 6,
-    marginBottom: 10,
-  },
-  tag: {
-    backgroundColor: "#E6F2FA",
-    padding: 8,
-    borderRadius: 20,
-  },
-  tagActive: {
-    backgroundColor: "#5FA8D3",
-  },
-  card: {
-    backgroundColor: "white",
-    padding: 14,
-    borderRadius: 10,
-    marginBottom: 10,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: "700",
-  },
+  screen: { flex: 1, backgroundColor: "#2E7AA1" },
 
-  /* ---------- Center box ---------- */
-  center: {
+  header: {
+    paddingTop: (Constants.statusBarHeight ?? 0) + 10, // ✅ MOBILE ALIGN FIX
+    paddingHorizontal: 18,
+    paddingBottom: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  headerTitle: {
+    backgroundColor: "#5FA8D3",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+    color: "white",
+    fontSize: 18,
+    fontWeight: "800",
     flex: 1,
-    backgroundColor: "#2E7AA1",
+    textAlign: "center",
+    marginRight: 10,
+  },
+  settingsBtn: {
+    width: 44,
+    height: 44,
     alignItems: "center",
     justifyContent: "center",
-    padding: 20,
   },
-  centerText: {
+  settingsIcon: { fontSize: 22 },
+
+  content: { paddingHorizontal: 18, paddingBottom: 24 },
+
+  searchWrap: {
+    backgroundColor: "white",
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    height: 46,
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(0,0,0,0.12)",
+    marginBottom: 12,
+  },
+  search: { flex: 1, fontSize: 15, color: "#111827", fontWeight: "600" },
+  searchIcon: { fontSize: 18 },
+
+  chipsRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 10,
+    marginBottom: 14,
+  },
+  chip: {
+    backgroundColor: "#EAF3F8",
+    borderRadius: 18,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+  },
+  chipActive: { backgroundColor: "#5FA8D3" },
+  chipText: { fontWeight: "900", color: "#0B2B35" },
+  chipTextActive: { color: "white" },
+
+  resultsText: {
+    color: "#0B2B35",
+    fontWeight: "900",
+    fontSize: 16,
+    marginBottom: 10,
+  },
+
+  loadingBox: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 30,
+  },
+  loadingText: { marginTop: 10, color: "white", fontWeight: "800" },
+
+  emptyBox: {
+    backgroundColor: "rgba(255,255,255,0.12)",
+    borderRadius: 12,
+    padding: 16,
+  },
+  emptyTitle: {
     color: "white",
-    marginTop: 10,
-    fontSize: 14,
-    fontWeight: "600",
-    textAlign: "center",
+    fontWeight: "900",
+    fontSize: 18,
+    marginBottom: 6,
   },
-  clearBtn: {
-    marginTop: 12,
+  emptyText: { color: "white", fontWeight: "600", marginBottom: 12 },
+
+  refreshBtn: {
     backgroundColor: "white",
     paddingVertical: 10,
     paddingHorizontal: 14,
     borderRadius: 10,
+    alignSelf: "flex-start",
   },
-  clearBtnText: {
-    color: "#2E7AA1",
-    fontWeight: "800",
+  refreshBtnText: { color: "#2E7AA1", fontWeight: "900" },
+
+  eventCard: {
+    backgroundColor: "white",
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 14,
+    borderWidth: 1,
+    borderColor: "rgba(0,0,0,0.12)",
   },
+  eventTitle: {
+    fontSize: 20,
+    fontWeight: "900",
+    color: "#111827",
+    marginBottom: 8,
+  },
+  metaRow: { gap: 6, marginBottom: 8 },
+  metaText: { color: "#111827", fontWeight: "700" },
+  spotsText: { color: "#374151", fontWeight: "800", marginBottom: 10 },
+
+  tagRow: { flexDirection: "row", gap: 10, flexWrap: "wrap" },
+  tagPill: {
+    backgroundColor: "#5FA8D3",
+    borderRadius: 999,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+  },
+  tagPillText: { color: "white", fontWeight: "900", fontSize: 12 },
 });
